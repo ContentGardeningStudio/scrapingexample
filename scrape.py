@@ -37,7 +37,6 @@ if res.status_code == 200:
 
         print(title, url, participants)
 
-
     # movies = soup.find_all('h3', 'lister-item-header')
     # for indice, movie in enumerate(movies, 1):
     #     movie_title = movie.find('a')
