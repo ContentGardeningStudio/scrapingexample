@@ -14,14 +14,29 @@ if res.status_code == 200:
     # print(soup.find('h3').findChild('a').text)
 
     movie_containers = soup.find_all("div", attrs={"class": "lister-item mode-advanced"})
-    print(movie_containers)
+    # print(movie_containers)
 
     for mc in movie_containers:
         # get all links and see if we can extract the title and other details from those links
         links = mc.find_all("a")
-        print(links)
-        for link in links:
-            print(link.text, link.attrs["href"])
+        # print(links)
+        title = ""
+        url = ""
+        participants = []
+
+        for link in links[1:]:
+            href = link.attrs["href"]
+            text = link.text
+            if text != "":
+                if href.startswith("/title/") and not href.endswith("/vote"):
+                    # print("Title ?", text, href)
+                    title = text
+                elif href.startswith("/name/"):
+                    # print("Name ?", text, href)
+                    participants.append({"name": text, "href": href})
+
+        print(title, url, participants)
+
 
     # movies = soup.find_all('h3', 'lister-item-header')
     # for indice, movie in enumerate(movies, 1):
