@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import csv
 
 # URL = 'https://www.imdb.com/search/title/?release_date=2023-01-01,2023-12-31'
 
@@ -23,7 +24,7 @@ if res.status_code == 200:
         title = ""
         url = ""
         participants = []
-        dict = {}
+        movies = {}
 
         for link in links[1:]:
             href = link.attrs["href"]
@@ -37,13 +38,20 @@ if res.status_code == 200:
                     participants.append({"name": text, "href": href})
 
         # print(title, url, participants)
-        dict['title'] = title
-        dict['participants'] = participants
+        movies['title'] = title
+        movies['participants'] = participants
         years = soup.find_all('span',attrs={"class": "lister-item-year text-muted unbold"})
         for year in years:
-            dict['year'] = year.text
+            movies['year'] = year.text
             break
-        print(dict)
+        print(movies)
+
+        headers = ['title','casting','url','year']
+        with open('movies.csv', 'w', encoding='UTF-8', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=headers)
+            writer.writeheader()
+            writer.writerows(movies)
+
 
     # movies = soup.find_all('h3', 'lister-item-header')
     # for indice, movie in enumerate(movies, 1):
