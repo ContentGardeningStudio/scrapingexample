@@ -23,6 +23,7 @@ if res.status_code == 200:
         title = ""
         url = ""
         participants = []
+        dict = {}
 
         for link in links[1:]:
             href = link.attrs["href"]
@@ -35,7 +36,14 @@ if res.status_code == 200:
                     # print("Name ?", text, href)
                     participants.append({"name": text, "href": href})
 
-        print(title, url, participants)
+        # print(title, url, participants)
+        dict['title'] = title
+        dict['participants'] = participants
+        years = soup.find_all('span',attrs={"class": "lister-item-year text-muted unbold"})
+        for year in years:
+            dict['year'] = year.text
+            break
+        print(dict)
 
     # movies = soup.find_all('h3', 'lister-item-header')
     # for indice, movie in enumerate(movies, 1):
