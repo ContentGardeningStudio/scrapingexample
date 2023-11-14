@@ -10,6 +10,9 @@ URL = 'https://www.imdb.com/search/title/?release_date=2023-01-01,'
 res = requests.get(URL)
 
 if res.status_code == 200:
+    # initialisation de la liste résultat
+    movies = []
+
     soup = BeautifulSoup(res.text, 'html.parser')
     # Affiche le 1er film
     # print(soup.find('h3').findChild('a').text)
@@ -24,7 +27,9 @@ if res.status_code == 200:
         title = ""
         url = ""
         participants = []
-        movies = {}
+
+        # Init du dict de chaque movie
+        movie = {}
 
         for link in links[1:]:
             href = link.attrs["href"]
@@ -38,22 +43,22 @@ if res.status_code == 200:
                     participants.append({"name": text, "href": href})
 
         # print(title, url, participants)
-        movies['title'] = title
-        movies['participants'] = participants
+        movie['title'] = title
+        movie['participants'] = participants
         years = soup.find_all('span',attrs={"class": "lister-item-year text-muted unbold"})
         for year in years:
-            movies['year'] = year.text
+            movie['year'] = year.text
             break
-        print(movies)
+        print(movie)
 
-        headers = ['title','casting','url','year']
+        # Une fois le dict movie prêt, on l'ajoute à la liste des movies
+        movies.append(movie)
+
+    # Maintenant on a movies, on peut faire l'enregistrement en CSV
+    # On s'assure quand même que la liste n'est pas vide...
+    if len(movies) != 0:
+        headers = ['title','participants','url','year']
         with open('movies.csv', 'w', encoding='UTF-8', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=headers)
             writer.writeheader()
             writer.writerows(movies)
-
-
-    # movies = soup.find_all('h3', 'lister-item-header')
-    # for indice, movie in enumerate(movies, 1):
-    #     movie_title = movie.find('a')
-    #     print(str(indice) + '.' + movie_title.text)
