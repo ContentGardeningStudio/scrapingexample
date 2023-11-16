@@ -62,3 +62,26 @@ if res.status_code == 200:
             writer = csv.DictWriter(f, fieldnames=headers)
             writer.writeheader()
             writer.writerows(movies)
+
+# Simplified case for testing (participants / casting for a given movie)
+casting_names = []
+casting_urls = []
+participants = [{'name': 'Aria Mia Loberti', 'href': '/name/nm13200978/'}, {'name': 'Louis Hofmann', 'href': '/name/nm3836977/'}, {'name': 'Lars Eidinger', 'href': '/name/nm1955257/'}, {'name': 'Hugh Laurie', 'href': '/name/nm0491402/'}]
+for p in participants:
+    vals = list(p.values())
+    # list() est nécessaire, ici dans notre cas, pour convertir l'object dict_values
+    print(vals)   # example output: ['Aria Mia Loberti', '/name/nm13200978/']
+
+    # deal with the name value... and collect the data in casting_names
+    name = vals[0]
+    # print(name)
+    casting_names.append(name)
+
+    # deal with the url/href value... and collect the data in casting_urls
+    url = vals[1]
+    # print(url)
+    casting_urls.append(url)
+
+print("COLLECTED DATA FOR THIS MOVIE:")
+print("=>", casting_names)
+print("=>", casting_urls)
