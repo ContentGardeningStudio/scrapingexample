@@ -7,18 +7,26 @@ import csv
 # Search of films released since 01/01/2023
 URL = 'https://www.imdb.com/search/title/?release_date=2023-01-01,'
 
-res = requests.get(URL)
+HEADERS = {
+    "User-Agent": "Mozilla/5.0"
+}
+
+res = requests.get(URL, headers=HEADERS)
 
 if res.status_code == 200:
+    print("Request OK")
     # initialisation de la liste résultat
     movies = []
 
+    # print(res.text)
     soup = BeautifulSoup(res.text, 'html.parser')
+    print(soup)
+
     # Affiche le 1er film
     # print(soup.find('h3').findChild('a').text)
 
     movie_containers = soup.find_all("div", attrs={"class": "lister-item mode-advanced"})
-    # print(movie_containers)
+    print(movie_containers)
 
     for mc in movie_containers:
         # get all links and see if we can extract the title and other details from those links
@@ -56,6 +64,8 @@ if res.status_code == 200:
 
     # Maintenant on a movies, on peut faire l'enregistrement en CSV
     # On s'assure quand même que la liste n'est pas vide...
+    print(movies)
+
     if len(movies) != 0:
         headers = ['title','participants','url','year']
         with open('movies.csv', 'w', encoding='UTF-8', newline='') as f:
