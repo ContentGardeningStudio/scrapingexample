@@ -8,13 +8,12 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 chrome_options = Options()
 chrome_options.add_experimental_option('detach', True)
-chromedriver_path = r'C:\Users\djimi\Desktop\Content Gardening Studio\chromedriver-win64\chromedriver.exe'
 # Open the website
 browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 browser.get("https://github.com/collections/machine-learning")
 
 # Extract all projects
-projects = browser.find_elements(By.TAG_NAME,'h1')[1:]
+projects = browser.find_elements(By.TAG_NAME, 'h1')[1:]
 list_projects = []
 for project in projects:
     dict_projects = {}
