@@ -26,32 +26,49 @@ for project in projects:
     except selenium.common.exceptions.NoSuchElementException:
         pass
 
-
+projects_infos = []
 for url in projects_urls:
     browser.get(url)
+    dict_projects_infos = {}
     url_externe = browser.find_element(By.CLASS_NAME, 'text-bold').get_attribute('href')
     try:
         tag = WebDriverWait(browser, 10).until(
             EC.presence_of_element_located((By.XPATH, "/html/body/div[1]/div[4]/div/main/turbo-frame/div/div/div/div[2]/div[1]/div[1]/div[3]/a[2]/strong"))
         )
+        dict_projects_infos['tags'] = tag.text
+
         star = WebDriverWait(browser, 10).until(
             EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div[4]/div/main/turbo-frame/div/div/div/div[2]/div[2]/div/div[1]/div/div/div[7]/a/strong'))
         )
+        dict_projects_infos['stars'] = star.text
+
         fork = WebDriverWait(browser, 10).until(
             EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div[4]/div/main/turbo-frame/div/div/div/div[2]/div[2]/div/div[1]/div/div/div[9]/a/strong'))
         )
-        fork = WebDriverWait(browser, 10).until(
-            EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div[4]/div/main/turbo-frame/div/div/div/div[2]/div[2]/div/div[1]/div/div/div[9]/a/strong'))
-        )
+        dict_projects_infos['forks'] = fork.text
+
         commit = WebDriverWait(browser, 10).until(
             EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div[4]/div/main/turbo-frame/div/div/div/div[2]/div[1]/div[2]/div[1]/div/div[4]/ul/li/a/span/strong'))
         )
-        print(url_externe)
-        print(tag.text + ' tags')
-        print(star.text + ' stars')
-        print(fork.text + ' forks')
-        print(commit.text + ' commits')
-        print('---------')
+        dict_projects_infos['commits'] = commit.text
+        projects_infos.append(dict_projects_infos)
+
+        # projects_infos = list(set(projects_infos))
+        # is_same = False
+        # res_list = []
+        # for i in range(len(projects_infos)):
+        #     if projects_infos[i] not in projects_infos[i + 1:]:
+        #         res_list.append(projects_infos[i])
+        # print(res_list)
+
+        # res_list = {frozenset(item.items()):
+        #                 item for item in projects_infos}.values()
+        # print(res_list)
+        # res_list = projects_infos[-1]
+
+        # affichage des infos des 2 premiers projets
+        print(projects_infos)
+
     finally:
         pass
     #languages = browser.find_elements(By.CLASS_NAME, 'color-fg-default text-bold mr-1')
