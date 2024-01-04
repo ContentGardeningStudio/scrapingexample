@@ -5,93 +5,62 @@ import csv
 # URL = 'https://www.imdb.com/search/title/?release_date=2023-01-01,2023-12-31'
 
 # Search of films released since 01/01/2023
-URL = 'https://www.imdb.com/search/title/?release_date=2023-01-01,'
-
-HEADERS = {
-    "User-Agent": "Mozilla/5.0"
-}
-
-res = requests.get(URL, headers=HEADERS)
-
-if res.status_code == 200:
-    print("Request OK")
-    # initialisation de la liste résultat
-    movies = []
-
-    # print(res.text)
-    soup = BeautifulSoup(res.text, 'html.parser')
-    print(soup)
-
-    # Affiche le 1er film
-    # print(soup.find('h3').findChild('a').text)
-
-    movie_containers = soup.find_all("div", attrs={"class": "lister-item mode-advanced"})
-    print(movie_containers)
-
-    for mc in movie_containers:
-        # get all links and see if we can extract the title and other details from those links
-        links = mc.find_all("a")
-        # print(links)
-        title = ""
-        url = ""
-        participants = []
-
-        # Init du dict de chaque movie
-        movie = {}
-
-        for link in links[1:]:
-            href = link.attrs["href"]
-            text = link.text
-            if text != "":
-                if href.startswith("/title/") and not href.endswith("/vote"):
-                    # print("Title ?", text, href)
-                    title = text
-                elif href.startswith("/name/"):
-                    # print("Name ?", text, href)
-                    participants.append({"name": text, "href": href})
-
-        # print(title, url, participants)
-        movie['title'] = title
-        movie['participants'] = participants
-        years = soup.find_all('span',attrs={"class": "lister-item-year text-muted unbold"})
-        for year in years:
-            movie['year'] = year.text
-            break
-        print(movie)
-
-        # Une fois le dict movie prêt, on l'ajoute à la liste des movies
-        movies.append(movie)
-
-    # Maintenant on a movies, on peut faire l'enregistrement en CSV
-    # On s'assure quand même que la liste n'est pas vide...
-    print(movies)
-
-    if len(movies) != 0:
-        headers = ['title','participants','url','year']
-        with open('movies.csv', 'w', encoding='UTF-8', newline='') as f:
-            writer = csv.DictWriter(f, fieldnames=headers)
+def save_data(headers, tab):
+    if tab:
+        with open('movies.csv', 'w', encoding='utf8', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=headers)
             writer.writeheader()
-            writer.writerows(movies)
+            writer.writerows(tab)
 
-# Simplified case for testing (participants / casting for a given movie)
-casting_names = []
-casting_urls = []
-participants = [{'name': 'Aria Mia Loberti', 'href': '/name/nm13200978/'}, {'name': 'Louis Hofmann', 'href': '/name/nm3836977/'}, {'name': 'Lars Eidinger', 'href': '/name/nm1955257/'}, {'name': 'Hugh Laurie', 'href': '/name/nm0491402/'}]
-for p in participants:
-    vals = list(p.values())
-    # list() est nécessaire, ici dans notre cas, pour convertir l'object dict_values
-    print(vals)   # example output: ['Aria Mia Loberti', '/name/nm13200978/']
+def scrape_url(website_url):
+    HEADERS = {
+        "User-Agent": "Mozilla/5.0"
+    }
+    res = requests.get(website_url, headers=HEADERS)
 
-    # deal with the name value... and collect the data in casting_names
-    name = vals[0]
-    # print(name)
-    casting_names.append(name)
+    if res.status_code == 200:
+        soup = BeautifulSoup(res.text, 'html.parser')
+        movie_containers = soup.find_all("div", attrs={"class": "lister-item mode-advanced"})
+        # print(movie_containers)
 
-    # deal with the url/href value... and collect the data in casting_urls
-    url = vals[1]
-    # print(url)
-    casting_urls.append(url)
+        for mc in movie_containers:
+            # get all links and see if we can extract the title and other details from those links
+            links = mc.find_all("a")
+            # print(links)
+            title = ""
+            url = ""
+            participants = []
 
-print("COLLECTED DATA FOR THIS MOVIE:")
-print("=>", casting_names)
-print("=>", casting_urls)
+            # Init du dict de chaque movie
+            movie = {}
+
+            for link in links[1:]:
+                href = link.attrs["href"]
+                text = link.text
+                if text != "":
+                    if href.startswith("/title/") and not href.endswith("/vote"):
+                        # print("Title ?", text, href)
+                        title = text
+                    elif href.startswith("/name/"):
+                        # print("Name ?", text, href)
+                        participants.append({"name": text, "href": href})
+
+            # print(title, url, participants)
+            movie['title'] = title
+            movie['participants'] = participants
+            years = soup.find_all('span', attrs={"class": "lister-item-year text-muted unbold"})
+            for year in years:
+                movie['year'] = year.text
+                break
+            # print(movie)
+
+            # Une fois le dict movie prêt, on l'ajoute à la liste des movies
+            movies.append(movie)
+            return movies
+
+
+URL = 'https://www.imdb.com/search/title/?release_date=2023-01-01,'
+movies = scrape_url(URL)
+print(type(movies))
+# headers = ['title', 'url', 'participants', 'year']
+# save_data(headers, movies)
