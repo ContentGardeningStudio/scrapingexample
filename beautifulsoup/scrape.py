@@ -4,6 +4,11 @@ import csv
 
 # URL = 'https://www.imdb.com/search/title/?release_date=2023-01-01,2023-12-31'
 
+HEADERS = {
+    "User-Agent": "Mozilla/5.0"
+}
+
+
 # Search of films released since 01/01/2023
 def save_data(headers, tab):
     if tab:
@@ -13,15 +18,17 @@ def save_data(headers, tab):
             writer.writerows(tab)
 
 def scrape_url(website_url):
-    HEADERS = {
-        "User-Agent": "Mozilla/5.0"
-    }
     res = requests.get(website_url, headers=HEADERS)
+
+    # initiualize movies list
+    movies = []
 
     if res.status_code == 200:
         soup = BeautifulSoup(res.text, 'html.parser')
-        movie_containers = soup.find_all("div", attrs={"class": "lister-item mode-advanced"})
-        # print(movie_containers)
+        # movie_containers = soup.find_all("div", attrs={"class": "lister-item mode-advanced"})
+        movie_containers = soup.find_all("li", attrs={"class": "ipc-metadata-list-summary-item"})
+
+        print(movie_containers)
 
         for mc in movie_containers:
             # get all links and see if we can extract the title and other details from those links
@@ -45,7 +52,7 @@ def scrape_url(website_url):
                         # print("Name ?", text, href)
                         participants.append({"name": text, "href": href})
 
-            # print(title, url, participants)
+            print(title, url, participants)
             movie['title'] = title
             movie['participants'] = participants
             years = soup.find_all('span', attrs={"class": "lister-item-year text-muted unbold"})
@@ -56,11 +63,13 @@ def scrape_url(website_url):
 
             # Une fois le dict movie prêt, on l'ajoute à la liste des movies
             movies.append(movie)
-            return movies
+
+    # the return needs to happen here
+    return movies
 
 
 URL = 'https://www.imdb.com/search/title/?release_date=2023-01-01,'
 movies = scrape_url(URL)
-print(type(movies))
+print(movies)
 # headers = ['title', 'url', 'participants', 'year']
 # save_data(headers, movies)
